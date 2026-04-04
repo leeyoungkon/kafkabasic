@@ -1,4 +1,4 @@
-package com.example.stocksaga;
+package com.example.ordersaga;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class KafkaConfig {
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "stock-service-group");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.stocksaga");
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.ordersaga");
         config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, SagaEvent.class.getName());
         config.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
         return new DefaultKafkaConsumerFactory<>(config);

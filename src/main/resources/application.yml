@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -17,11 +14,11 @@ spring:
         jdbc:
           time_zone: ${SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE:Asia/Seoul}
     open-in-view: false
-
+    
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID:stock-service-group}
+      group-id: order-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer

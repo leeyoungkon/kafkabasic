@@ -1,13 +1,13 @@
-package com.example.stocksaga;
+package com.example.ordersaga;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class StockSagaApplication {
+public class OrderSagaApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(StockSagaApplication.class, args);
+		SpringApplication.run(OrderSagaApplication.class, args);
 	}
 
 }

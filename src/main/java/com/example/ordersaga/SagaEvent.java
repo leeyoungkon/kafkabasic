@@ -1,4 +1,4 @@
-package com.example.stocksaga;
+package com.example.ordersaga;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

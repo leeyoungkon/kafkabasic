@@ -143,6 +143,49 @@
       font-size: 12px;
       font-weight: 700;
     }
+
+    .stock-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .stock-row input {
+      flex: 1;
+    }
+
+    .btn-stock {
+      flex-shrink: 0;
+      background: var(--accent-soft);
+      color: #0e4a4f;
+      padding: 11px 12px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .btn-stock:hover {
+      background: #60b0aa;
+      transform: translateY(-1px);
+    }
+
+    .stock-result {
+      margin-top: 6px;
+      font-size: 13px;
+      min-height: 20px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #f0ece4;
+      display: none;
+    }
+
+    .stock-result.visible {
+      display: block;
+    }
+
+    .stock-result.low {
+      background: #fde8db;
+      color: var(--danger);
+    }
   </style>
 </head>
 <body>
@@ -154,7 +197,11 @@
     <form id="orderForm">
       <div>
         <label for="productId">상품 ID</label>
-        <input id="productId" name="productId" placeholder="P-1001" required>
+        <div class="stock-row">
+          <input id="productId" name="productId" placeholder="P-1001" required>
+          <button type="button" class="btn-stock" id="checkStockBtn">재고 확인</button>
+        </div>
+        <div id="stockResult" class="stock-result"></div>
       </div>
       <div>
         <label for="quantity">수량</label>
@@ -196,6 +243,8 @@
   const form = document.getElementById('orderForm');
   const statusBox = document.getElementById('status');
   const eventBody = document.getElementById('eventBody');
+  const checkStockBtn = document.getElementById('checkStockBtn');
+  const stockResult = document.getElementById('stockResult');
 
   function setStatus(msg, isError = false) {
     statusBox.textContent = msg;
@@ -262,6 +311,31 @@
 
   loadEvents();
   setInterval(loadEvents, 5000);
+
+  checkStockBtn.addEventListener('click', async () => {
+    const productId = form.productId.value.trim();
+    if (!productId) {
+      stockResult.textContent = '상품 ID를 먼저 입력하세요.';
+      stockResult.className = 'stock-result visible low';
+      return;
+    }
+    checkStockBtn.disabled = true;
+    checkStockBtn.textContent = '조회 중...';
+    try {
+      const res = await fetch(`/orders/inventory/${encodeURIComponent(productId)}`);
+      if (!res.ok) throw new Error('재고 조회 실패: ' + res.status);
+      const data = await res.json();
+      const qty = data.quantity;
+      stockResult.textContent = `현재 재고: ${qty}개`;
+      stockResult.className = 'stock-result visible' + (qty <= 5 ? ' low' : '');
+    } catch (err) {
+      stockResult.textContent = err.message;
+      stockResult.className = 'stock-result visible low';
+    } finally {
+      checkStockBtn.disabled = false;
+      checkStockBtn.textContent = '재고 확인';
+    }
+  });
 </script>
 </body>
 </html>

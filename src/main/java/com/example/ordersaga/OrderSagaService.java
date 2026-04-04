@@ -46,6 +46,16 @@ public class OrderSagaService {
         if (order != null && order.getStatus() != OrderStatus.CANCELLED) {
             order.setStatus(OrderStatus.STOCK_RESERVED);
             orderRepository.save(order);
+            
+            SagaEvent event = new SagaEvent(
+                    "StockReserved",
+                    orderId,
+                    order.getProductId(),
+                    order.getQuantity(),
+                    order.getAmount(),
+                    null
+            );
+            sagaEventLogRepository.save(SagaEventLog.of("ORDER_SERVICE", event));
         }
     }
 
@@ -54,6 +64,16 @@ public class OrderSagaService {
         if (order != null && order.getStatus() != OrderStatus.CANCELLED) {
             order.setStatus(OrderStatus.COMPLETED);
             orderRepository.save(order);
+            
+            SagaEvent event = new SagaEvent(
+                    "OrderCompleted",
+                    orderId,
+                    order.getProductId(),
+                    order.getQuantity(),
+                    order.getAmount(),
+                    null
+            );
+            sagaEventLogRepository.save(SagaEventLog.of("ORDER_SERVICE", event));
         }
     }
 
@@ -85,6 +105,41 @@ public class OrderSagaService {
     }
 
     public List<SagaEventLog> findAllEvents() {
-        return sagaEventLogRepository.findAllByOrderByCreatedAtDesc();
+        List<SagaEventLog> events = sagaEventLogRepository.findAllByOrderByCreatedAtDesc();
+        boolean hasUpdates = false;
+
+        for (SagaEventLog event : events) {
+            if (isBlank(event.getSource())) {
+                String inferredSource = inferSourceByEventType(event.getEventType());
+                event.setSource(inferredSource);
+                hasUpdates = true;
+            }
+        }
+
+        if (hasUpdates) {
+            sagaEventLogRepository.saveAll(events);
+        }
+
+        return events;
+    }
+
+    private String inferSourceByEventType(String eventType) {
+        if (eventType == null) {
+            return "UNKNOWN_SERVICE";
+        }
+        if (eventType.startsWith("Stock")) {
+            return "STOCK_SERVICE";
+        }
+        if (eventType.startsWith("Payment")) {
+            return "PAYMENT_SERVICE";
+        }
+        if (eventType.startsWith("Order")) {
+            return "ORDER_SERVICE";
+        }
+        return "UNKNOWN_SERVICE";
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

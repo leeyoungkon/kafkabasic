@@ -12,6 +12,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderSagaService orderSagaService;
+    private final StockClient stockClient;
 
     @PostMapping
     public Order create(@RequestBody CreateOrderRequest request) {
@@ -26,5 +27,10 @@ public class OrderController {
     @GetMapping("/events")
     public List<SagaEventLog> events() {
         return orderSagaService.findAllEvents();
+    }
+
+    @GetMapping("/inventory/{productId}")
+    public QuantityResponse getInventory(@PathVariable String productId) {
+        return stockClient.getQuantity(productId);
     }
 }

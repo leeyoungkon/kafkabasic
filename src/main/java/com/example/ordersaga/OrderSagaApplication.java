@@ -1,13 +1,13 @@
-package com.example.kafkabasic;
+package com.example.ordersaga;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class KafkabasicApplication {
+public class OrderSagaApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(KafkabasicApplication.class, args);
+		SpringApplication.run(OrderSagaApplication.class, args);
 	}
 
 }

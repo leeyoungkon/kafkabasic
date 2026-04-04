@@ -44,6 +44,15 @@ public class StockController {
         return sagaEventLogRepository.findTop200ByOrderByCreatedAtDesc();
     }
 
+    @GetMapping("/inventory/{productId}")
+    public QuantityResponse getQuantity(@PathVariable String productId) {
+        int quantity = inventoryService.getQuantityByProductId(productId);
+        return new QuantityResponse(productId, quantity);
+    }
+
+    public record QuantityResponse(String productId, int quantity) {
+    }
+
     public record InventoryUpdateRequest(int quantity) {
     }
 }

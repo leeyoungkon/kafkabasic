@@ -72,6 +72,13 @@ public class InventoryService {
         return inventoryRepository.findAllByOrderByProductIdAsc();
     }
 
+    @Transactional(readOnly = true)
+    public int getQuantityByProductId(String productId) {
+        return inventoryRepository.findById(productId)
+                .map(InventoryItem::getQuantity)
+                .orElse(0);
+    }
+
     private void initializeIfMissing(String productId, int quantity) {
         if (inventoryRepository.existsById(productId)) {
             return;

@@ -1,43 +1,53 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kafkabasic
+  name: order-saga
   namespace: kafka
   labels:
-    app: kafkabasic
+    app: order-saga
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafkabasic
+      app: order-saga
   template:
     metadata:
       labels:
-        app: kafkabasic
+        app: order-saga
     spec:
       containers:
-        - name: kafkabasic
-          image: yklee2002/kafkabasic:latest
+        - name: order-saga
+          image: yklee2002/order-saga:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap.kafka:9092
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql.default.svc.cluster.local:3306/orderdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root1234
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_DATABASE_PLATFORM
+              value: org.hibernate.dialect.MySQLDialect
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafkabasic-service
+  name: order-saga-service
   namespace: kafka
   labels:
-    app: kafkabasic
+    app: order-saga
 spec:
   type: NodePort
   selector:
-    app: kafkabasic
+    app: order-saga
   ports:
     - name: http
       port: 8080
       targetPort: 8080
-      nodePort: 30080
+      nodePort: 30300
